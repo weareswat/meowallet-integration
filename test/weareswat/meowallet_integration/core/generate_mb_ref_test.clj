@@ -4,14 +4,14 @@
             [result.core :as result]))
 
 (deftest transform-input-data-test
-  (let [input-data {:api-key "qwe23"
+  (let [input-data {:provider {:api-key "qwe23"}
                     :amount 10
                     :currency "EUR"
                     :expires-at "2016-05-18T15:59:58+0000"}
         result (generate-mb-ref/transform-input-data input-data)]
 
     (testing "credentials"
-      (is (= (:api-key input-data)
+      (is (= (get-in input-data [:provider :api-key])
              (get-in result [:credentials :meo-wallet-api-key]))))
 
     (testing "amount"
@@ -25,4 +25,68 @@
     (testing "expires"
       (is (= (:expires-at input-data)
              (get-in result [:data :expires]))))))
+
+(deftest transform-output-data-test
+  (let [meo-result-data {:amount 10
+                         :fee -0.62
+                         :date "2016-05-17T15:36:25+0000"
+                         :method "MB"
+                         :amount_net 9.38
+                         :requests 1
+                         :channel "WEBSITE"
+                         :type "PAYMENT"
+                         :mb {:ref 243323013
+                              :entity 90426}
+                         :expires "2016-05-18T15:59:58+0000"
+                         :currency "EUR"
+                         :refundable false
+                         :ext_invoiceid "i00001232"
+                         :status "PENDING"
+                         :id "33de099a-49f1-42a7-913f-761f2e83b673"
+                         :items []
+                         :merchant {:id 688892900
+                                    :name "merchant-name"
+                                    :email "merchant-email"}}
+        result (generate-mb-ref/transform-output-data meo-result-data)]
+
+    (testing "currency"
+      (is (= (:currency meo-result-data)
+             (:currency result))))
+
+    (testing "expires"
+      (is (= (:expires meo-result-data)
+             (:expires-at result))))
+
+    (testing "fee"
+      (is (= (:fee meo-result-data)
+             (:fee result))))
+
+    (testing "date"
+      (is (= (:date meo-result-data)
+             (:created-at result))))
+
+    (testing "payment-method"
+      (is (= (:method meo-result-data)
+             (:payment-method result))))
+
+    (testing "transaction-id"
+      (is (= (:id meo-result-data)
+             (:transaction-id result))))
+
+    (testing "status"
+      (is (= (:status meo-result-data)
+             (:status result))))
+
+    (testing "mb"
+      (testing "amount"
+        (is (= (:amount meo-result-data)
+               (get-in result [:mb :amount]))))
+
+      (testing "ref"
+        (is (= (get-in meo-result-data [:mb :ref])
+               (get-in result [:mb :ref]))))
+
+      (testing "entity"
+        (is (= (get-in meo-result-data [:mb :entity])
+               (get-in result [:mb :entity])))))))
 
