@@ -9,6 +9,7 @@
 
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [org.clojure/core.async "0.2.374"]
+                 [weareswat/clj-meowallet "0.1.0"]
                  [com.taoensso/timbre "4.3.1"]
                  [prismatic/schema "1.1.1"]
                  [compojure "1.5.0"]
