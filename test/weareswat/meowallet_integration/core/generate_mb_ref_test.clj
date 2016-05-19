@@ -28,7 +28,7 @@
 
     (testing "expires"
       (is (= (:expires-at input-data)
-             (get-in result [:data :expired-at]))))))
+             (get-in result [:data :expires]))))))
 
 (deftest transform-output-data-test
   (let [meo-result-data {:amount 10
@@ -60,7 +60,7 @@
              (:currency result))))
 
     (testing "expires"
-      (is (= (:expires-at meo-result-data)
+      (is (= (:expires meo-result-data)
              (:expires-at result))))
 
     (testing "fee"

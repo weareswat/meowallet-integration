@@ -33,6 +33,10 @@
   :scm {:name "git"
         :url "git@github.com:weareswat/meowallet-integration.git"}
 
+  :main weareswat.meowallet-integration.core
+  :ring {:handler weareswat.meowallet-integration.http-component/app}
+  :uberjar-name "weareswat.meowallet-integration.jar"
+
   :profiles {:test {:dependencies [[ring/ring-mock "0.3.0"]
                                    [org.clojure/tools.namespace "0.2.11"]]
 

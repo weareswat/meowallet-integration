@@ -10,7 +10,7 @@
     {:credentials {:meo-wallet-api-key (get-in context [:supplier :api-key])}
      :data {:amount (:amount context)
             :currency (:currency context)
-            :expired-at (:expires-at context)}}))
+            :expires (:expires-at context)}}))
 
 (defn transform-output-data
   [result]
@@ -19,7 +19,7 @@
      :created-at (:date result)
      :payment-method (:method result)
      :currency (:currency result)
-     :expires-at (:expired-at result)
+     :expires-at (:expires result)
      :transaction-id (:id result)
      :status (:status result)
      :mb {:ref (get-in result [:mb :ref])
