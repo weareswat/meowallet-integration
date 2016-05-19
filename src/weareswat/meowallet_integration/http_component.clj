@@ -24,11 +24,19 @@
   (fn [request]
     (f (assoc request :system system))))
 
+(defn content-type
+  [f]
+  (fn [request]
+    (f (->> (:headers request)
+            (merge {"content-type" "application/json"})
+            (assoc request :headers)))))
+
 (defn app
   "The main app handler"
   [system]
-  (-> (compojure/routes routes/public-routes)
+  (-> (routes/routes)
       (set-system system)
+      (content-type)
       (wrap-json-response)
       (setup-cors)))
 

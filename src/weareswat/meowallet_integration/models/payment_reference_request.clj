@@ -5,9 +5,10 @@
 
 (def schema
   "Representation of this model"
-  {:supplier s/Any
+  {:supplier {:api-key s/Str}
    :amount s/Num
-   :currency s/Str})
+   (s/optional-key :currency) s/Str
+   (s/optional-key :expires-at) s/Any})
 
 (defn validate
   "Validates a given payment reference request"

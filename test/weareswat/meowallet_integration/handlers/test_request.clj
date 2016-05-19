@@ -7,11 +7,18 @@
             [clojure.edn :as edn]
             [ring.mock.request :as mock]))
 
+(defn ->edn [raw]
+  (cond
+    (coll? raw) raw
+    (string? raw) (json/parse-string raw true)
+    :else (json/parse-string (slurp raw) true)))
+
 (defn parsed-response
   "Gets the response for a HTTP request"
   [method path & [body-data]]
   (let [system (component/start (system/create))
         body-data (if (nil? body-data) nil (json/generate-string body-data))
-        response ((http/app system) (mock/request method path body-data))]
+        response ((http/app system) (-> (mock/request method path body-data)
+                                        (mock/content-type "application/json")))]
     (component/stop system)
-    (assoc response :body (json/parse-string (:body response) true))))
+    (assoc response :body (->edn (:body response)))))

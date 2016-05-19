@@ -15,11 +15,11 @@
       (is (= 200 (:status response)))))
 
   (testing "/payment-reference/create returns OK"
-    (let [body {:amount 10
+    (let [body {:supplier {:api-key "wqkjejkqw"}
                 :currency "EUR"}
           response (test-request/parsed-response :post "/payment-reference/create" body)
           body (:body response)]
       (is (= "missing-required-key"
-             (:supplier body)))
+             (get-in body [:errors :amount])))
       (is (= 400 (:status response)))))
   )
