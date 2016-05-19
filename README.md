@@ -12,4 +12,5 @@ You need to install [lein](http://leiningen.org/)
 
 * `lein test` - runs the test suite
 * `script/autotest` or `lein autotest` -listen for file changes and is always running tests
-
+* To Run the integration test you should provide a valid Meo Wallet API KEY with access to mb references api.
+  `MEO_WALLET_API_KEY=<YOUR_MEO_WALLET_API_KEY> lein test`

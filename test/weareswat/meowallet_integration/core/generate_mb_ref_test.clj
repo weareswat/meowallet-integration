@@ -1,17 +1,21 @@
 (ns weareswat.meowallet-integration.core.generate-mb-ref-test
   (:use clojure.test)
   (:require [weareswat.meowallet-integration.core.generate-mb-ref :as generate-mb-ref]
+            [clojure.core.async :refer [<!!]]
+            [environ.core :refer [env]]
             [result.core :as result]))
 
 (deftest transform-input-data-test
-  (let [input-data {:provider {:api-key "qwe23"}
+  (let [input-data {:supplier {:api-key "qwe23"}
                     :amount 10
                     :currency "EUR"
                     :expires-at "2016-05-18T15:59:58+0000"}
         result (generate-mb-ref/transform-input-data input-data)]
 
+    (is (result/succeeded? result))
+
     (testing "credentials"
-      (is (= (get-in input-data [:provider :api-key])
+      (is (= (get-in input-data [:supplier :api-key])
              (get-in result [:credentials :meo-wallet-api-key]))))
 
     (testing "amount"
@@ -24,7 +28,7 @@
 
     (testing "expires"
       (is (= (:expires-at input-data)
-             (get-in result [:data :expires]))))))
+             (get-in result [:data :expired-at]))))))
 
 (deftest transform-output-data-test
   (let [meo-result-data {:amount 10
@@ -49,12 +53,14 @@
                                     :email "merchant-email"}}
         result (generate-mb-ref/transform-output-data meo-result-data)]
 
+    (is (result/succeeded? result))
+
     (testing "currency"
       (is (= (:currency meo-result-data)
              (:currency result))))
 
     (testing "expires"
-      (is (= (:expires meo-result-data)
+      (is (= (:expires-at meo-result-data)
              (:expires-at result))))
 
     (testing "fee"
@@ -90,3 +96,48 @@
         (is (= (get-in meo-result-data [:mb :entity])
                (get-in result [:mb :entity])))))))
 
+(deftest generate-mb-ref
+  (if-not (env :meo-wallet-api-key)
+    (println "Warning: No meo wallet api key on env (ignoring test)")
+
+    (let [input-data {:supplier {:api-key (env :meo-wallet-api-key)}
+                      :amount 10
+                      :currency "EUR"}
+          result (<!! (generate-mb-ref/run input-data))]
+
+      (is (result/succeeded? result))
+
+      (testing "validate format result"
+
+        (testing "payment-method"
+          (is (= "MB"
+                 (:payment-method result))))
+
+        (testing "currency"
+          (is (= (:currency input-data)
+                 (:currency result))))
+
+        (testing "transaction-id"
+          (is (:transaction-id result)))
+
+        (testing "created-at"
+          (is (:created-at result)))
+
+        (testing "fee"
+          (is (:fee result)))
+
+        (testing "status"
+          (is (= "PENDING"
+                 (:status result))))
+
+        (testing "mb"
+          (is (:mb result))
+
+          (testing "ref"
+            (is (get-in result [:mb :ref])))
+
+          (testing "entity"
+            (is (get-in result [:mb :entity])))
+
+          (testing "amount"
+            (is (get-in result [:mb :amount]))))))))
