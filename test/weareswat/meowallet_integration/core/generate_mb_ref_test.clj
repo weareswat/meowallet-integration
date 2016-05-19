@@ -103,7 +103,7 @@
     (let [input-data {:supplier {:api-key (env :meo-wallet-api-key)}
                       :amount 10
                       :currency "EUR"}
-          result (<!! (generate-mb-ref/run input-data))]
+          result (<!! (generate-mb-ref/run {} input-data))]
 
       (is (result/succeeded? result))
 

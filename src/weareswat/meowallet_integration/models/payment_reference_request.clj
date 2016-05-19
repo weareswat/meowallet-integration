@@ -5,7 +5,13 @@
 
 (def schema
   "Representation of this model"
-  {(s/required-key :provider) s/Any
-   (s/required-key :amount) s/Num
-   (s/required-key :currency) s/Str
-   :expires-at s/Any})
+  {:supplier s/Any
+   :amount s/Num
+   :currency s/Str})
+
+(defn validate
+  "Validates a given payment reference request"
+  [model]
+  (if-let [errors (s/check schema model)]
+    (result/failure errors)
+    (result/success)))

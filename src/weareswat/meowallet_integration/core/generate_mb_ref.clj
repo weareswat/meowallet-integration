@@ -1,6 +1,7 @@
 (ns weareswat.meowallet-integration.core.generate-mb-ref
   (:require [result.core :as result]
             [clojure.core.async :refer [go <!]]
+            [weareswat.meowallet-integration.models.payment-reference-request :as prr]
             [clj-meowallet.core :as meowallet]))
 
 (defn transform-input-data
@@ -30,9 +31,10 @@
   (meowallet/generate-mb-ref credentials data))
 
 (defn run
-  [context]
+  [context data]
   (go
-    (result/enforce-let [input-data (transform-input-data context)
+    (result/enforce-let [_ (prr/validate data)
+                         input-data (transform-input-data data)
                          result (<! (generate-mb-ref (:credentials input-data)
                                                      (:data input-data)))]
       (transform-output-data result))))
