@@ -14,24 +14,22 @@
   (sweet/routes
     (sweet/GET "/" request
                :return {:name s/Str
-                        :version s/Str
                         :success s/Bool}
-               :no-doc true
-               :summary "Just an Heelo World endpoint"
+               :summary "Just an Hello World endpoint"
                (index/handle request))
     (sweet/POST "/payment-reference/create" request
                 :body [input prr/schema]
-                :return {:success s/Bool
-                         :fee s/Num
-                         :created-at s/Any
-                         :expires-at s/Any
-                         :payment-method s/Str
-                         :mb {:amount s/Num
-                              :ref s/Any
-                              :entity s/Any}
-                         :currency s/Str
-                         :status s/Str
-                         :transaction-id s/Any}
+                :return s/Any ;{:success s/Bool
+                        ; :fee s/Num
+                        ; :created-at s/Any
+                        ; :expires-at s/Any
+                        ; :payment-method s/Str
+                        ; :mb {:amount s/Num
+                        ;      :ref s/Any
+                        ;      :entity s/Any}
+                        ; :currency s/Str
+                        ; :status s/Str
+                        ; :transaction-id s/Any}
                 :summary "Request MEOWallet for MB Reference"
                 :description "Returns MB Reference related data"
                 (generate-mb-ref/handle request)

@@ -7,7 +7,7 @@
   "Representation of this model"
   {:supplier {:api-key s/Str}
    :amount s/Num
-   (s/optional-key :currency) s/Str
+   :currency s/Str
    (s/optional-key :expires-at) s/Any})
 
 (defn validate

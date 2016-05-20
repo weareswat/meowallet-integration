@@ -6,7 +6,6 @@
 (defn handle
   "Runs a welcome route"
   [request]
-  (-> {:name "WeAreSWAT Meo Wallet Integration"
-       :version (System/getProperty "meowallet-integration.version")}
+  (-> {:name "WeAreSWAT Meo Wallet Integration"}
       result/success
       reply/ok))

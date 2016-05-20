@@ -15,7 +15,8 @@
   [handler]
   (cors/wrap-cors handler
                   :access-control-allow-origin
-                  [#"^http://localhost(.*)"]
+                  [#"^http://localhost(.*)"
+                   #"^http?://(.*)meo-wallet-integration-staging.herokuapp.com(.*)"]
                   :access-control-allow-methods [:get :put :post :delete]))
 
 (defn- set-system
