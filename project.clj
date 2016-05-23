@@ -11,7 +11,7 @@
                  [org.clojure/core.async "0.2.374"]
                  [metosin/compojure-api "1.1.0"]
                  [weareswat/request-utils "0.1.0"]
-                 [weareswat/clj-meowallet "0.4.0"]
+                 [weareswat/clj-meowallet "0.5.0"]
                  [prismatic/schema "1.1.1"]
                  [com.taoensso/timbre "4.3.1"]
                  [prismatic/schema "1.1.1"]
