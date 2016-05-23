@@ -1,6 +1,8 @@
 (ns weareswat.meowallet-integration.core.notify-about-payment
   (:require [result.core :as result]
+            [clojure.core.async :refer [go <!]]
             [environ.core :refer [env]]
+            [clj-meowallet.core :as meowallet]
             [request-utils.core :as request-utils]))
 
 (defn host
@@ -25,7 +27,13 @@
    :path path-to-callback
    :body data})
 
+(defn check-data-authenticity
+  [data]
+  (meowallet/verify-callback data))
+
 (defn run!
   [context data]
-  (result/enforce-let [data (transform-data data)]
-    (request-utils/http-post (prepare-data-to-request data))))
+  (go
+    (result/enforce-let [_ (<! (check-data-authenticity data))
+                         data (transform-data data)]
+      (request-utils/http-post (prepare-data-to-request data)))))
