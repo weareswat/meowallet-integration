@@ -1,6 +1,7 @@
 (ns weareswat.meowallet-integration.core.notify-about-payment-test
   (:use clojure.test)
   (:require [weareswat.meowallet-integration.core.notify-about-payment :as notify-about-payment]
+            [clj-meowallet.core :as meowallet]
             [clojure.core.async :refer [<!! go]]
             [environ.core :refer [env]]
             [result.core :as result]
@@ -35,12 +36,56 @@
       (is (= :meo-wallet
              (:provider-key result))))))
 
-(deftest transform-data-test
-  (with-redefs [request-utils/http-post (fn [url] {:success true
-                                                   :status 200})
-                notify-about-payment/check-data-authenticity (fn [data]
-                                                               (go {:success true
-                                                                    :status 200}))]
+(deftest sync-with-payment-gateway-and-get-auth-token-test
+  (with-redefs [request-utils/http-post (fn [url] (go {:success true
+                                                       :status 200
+                                                       :body {:supplier {:token "faketoken"}}}))]
+    (let [result (<!! (notify-about-payment/sync-with-payment-gateway-and-get-auth-token {}))]
+      (is (result/succeeded? result))
+      (is (= "faketoken"
+             (get-in result [:supplier :token]))))))
+
+(deftest fail-to-check-data-authenticity-flow
+  (with-redefs [notify-about-payment/sync-with-payment-gateway (fn [url] (go {:success true
+                                                                              :status 200
+                                                                              :body {:supplier {:token "faketoken"}}}))
+                meowallet/verify-callback (fn [auth-token url]
+                                            (go {:success false
+                                                 :status 400
+                                                 :token auth-token}))]
+    (let [input-data {:currency "EUR"
+                      :amount 10
+                      :event "COMPLETED"
+                      :ext-customerid "00001"
+                      :ext-email "noreply@sapo.pt"
+                      :ext-invoiceid "38440200100"
+                      :method "WALLET"
+                      :operation-id "qwkjehqkjwhe"
+                      :operation-status "COMPLETED"
+                      :user "237"}
+          result (<!! (notify-about-payment/run! {} input-data))]
+
+      (is (result/failed? result))
+
+      (testing "should return 400"
+        (is (= 400
+               (:status result))))
+
+      (testing "should have a properly formatted token"
+        (is (= "faketoken"
+               (get-in result [:token :meo-wallet-api-key]))))
+      )))
+
+(deftest notify-about-payment-test
+  (with-redefs [notify-about-payment/sync-with-payment-gateway (fn [url] (go {:success true
+                                                                              :status 200
+                                                                              :body {:supplier {:token "faketoken"}}}))
+                meowallet/verify-callback (fn [auth-token url]
+                                            (go {:success true
+                                                 :status 200}))
+                notify-about-payment/sync-verified (fn [data] (go {:success true
+                                                                   :status 200
+                                                                   :data data}))]
     (let [input-data {:currency "EUR"
                       :amount 10
                       :event "COMPLETED"

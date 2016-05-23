@@ -2,6 +2,7 @@
   (:use clojure.test)
   (:require [weareswat.meowallet-integration.handlers.test-request :as test-request]
             [environ.core :refer [env]]
+            [clj-meowallet.core :as meowallet]
             [weareswat.meowallet-integration.core.notify-about-payment :as notify-about-payment]
             [clojure.core.async :refer [go]]
             [request-utils.core :as request-utils]
@@ -9,11 +10,15 @@
 
 (deftest basic-test
   (testing "root/payment-reference/event returns OK"
-    (with-redefs [request-utils/http-post (fn [url] {:success true
-                                                     :status 200})
-                 notify-about-payment/check-data-authenticity (fn [data]
-                                                                (go {:success true
-                                                                     :status 200}))]
+    (with-redefs [notify-about-payment/sync-with-payment-gateway (fn [url] (go {:success true
+                                                                                :status 200
+                                                                                :body {:supplier {:token "faketoken"}}}))
+                meowallet/verify-callback (fn [auth-token url]
+                                            (go {:success true
+                                                 :status 200}))
+                notify-about-payment/sync-verified (fn [data] (go {:success true
+                                                                   :status 200
+                                                                   :data data}))]
       (let [body {:currency "EUR"
                   :amount 10
                   :event "COMPLETED"
