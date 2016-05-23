@@ -8,6 +8,7 @@
     [result.core :as result]
     [weareswat.meowallet-integration.models.payment-reference-request :as prr]
     [weareswat.meowallet-integration.handlers.generate-mb-ref :as generate-mb-ref]
+    [weareswat.meowallet-integration.handlers.notify-about-payment :as notify-about-payment]
     [weareswat.meowallet-integration.handlers.index :as index]))
 
 (def sweet-public-routes
@@ -33,6 +34,14 @@
                 :summary "Request MEOWallet for MB Reference"
                 :description "Returns MB Reference related data"
                 (generate-mb-ref/handle request)
+      )
+    (sweet/POST "/payment-reference/event" request
+                :body [input s/Any]
+                :return s/Any
+                :summary "Webhood called by meowallet"
+                :description "Webhook to be notified when the state of some mb-reference changed.
+                              This endpoint should be called by meowallet"
+                (notify-about-payment/handle request)
       ))
   )
 
