@@ -1,4 +1,5 @@
 (ns weareswat.meowallet-integration.core.notify-about-payment
+  (:refer-clojure :exclude [run!])
   (:require [result.core :as result]
             [clojure.core.async :refer [go <!]]
             [environ.core :refer [env]]
@@ -19,21 +20,49 @@
      :provider-key :meo-wallet
      :status-description (:user-error data)}))
 
-(def path-to-callback "/payment-reference/event")
+(def path-to-sync-event "/payment-reference/event")
+(def path-to-verify "/payment-reference/verify")
 
 (defn prepare-data-to-request
-  [data]
+  [data path]
   {:host (host)
-   :path path-to-callback
+   :path path
    :body data})
 
-(defn check-data-authenticity
+(defn sync-with-payment-gateway
   [data]
-  (meowallet/verify-callback data))
+  (request-utils/http-post data))
+
+(defn sync-with-payment-gateway-and-get-auth-token
+  [data]
+  (go
+    (let [data (-> (assoc data :verified false)
+                   (assoc :return-supplier true)
+                   (prepare-data-to-request path-to-sync-event))
+          result (<! (sync-with-payment-gateway data))]
+      (if (result/succeeded? result)
+        (result/success (:body result))
+        result))))
+
+(defn check-data-authenticity
+  [auth-token data]
+  (-> {:meo-wallet-api-key (get-in auth-token [:supplier :token])}
+      (meowallet/verify-callback data)))
+
+(defn sync-verified-with-payment
+  [data]
+  (request-utils/http-post data))
+
+(defn sync-verified
+  [data]
+  (-> (assoc data :verified true)
+      (prepare-data-to-request path-to-verify)
+      (sync-verified-with-payment)))
 
 (defn run!
   [context data]
   (go
-    (result/enforce-let [_ (<! (check-data-authenticity data))
-                         data (transform-data data)]
-      (request-utils/http-post (prepare-data-to-request data)))))
+    (result/enforce-let [transformed-data (transform-data data)
+                         auth-token (<! (sync-with-payment-gateway-and-get-auth-token transformed-data))
+                         _ (<! (check-data-authenticity auth-token data))]
+      (<! (sync-verified transformed-data)))))
