@@ -96,7 +96,62 @@
         (is (= (get-in meo-result-data [:mb :entity])
                (get-in result [:mb :entity])))))))
 
+(deftest date-test
+  (let [result (generate-mb-ref/date->meowallet-date "2016-08-18")]
+    (is (= "2016-08-18T00:00:00+0000" result))))
+
 (deftest generate-mb-ref
+  (if-not (env :meo-wallet-api-key)
+    (println "Warning: No meo wallet api key on env (ignoring test)")
+
+    (let [input-data {:supplier {:api-key (env :meo-wallet-api-key)}
+                      :amount 10
+                      :expires-at "2016-08-18T15:59:58+0000"
+                      :currency "EUR"}
+          result (<!! (generate-mb-ref/run {} input-data))]
+
+      (is (result/succeeded? result))
+
+      (testing "validate format result"
+
+        (testing "payment-method"
+          (is (= "MB"
+                 (:payment-method result))))
+
+        (testing "expires-at"
+          (is (= (:expires-at input-data)
+                 (:expires-at result))))
+
+        (testing "currency"
+          (is (= (:currency input-data)
+                 (:currency result))))
+
+        (testing "transaction-id"
+          (is (:transaction-id result)))
+
+        (testing "created-at"
+          (is (:created-at result)))
+
+        (testing "fee"
+          (is (:fee result)))
+
+        (testing "status"
+          (is (= "PENDING"
+                 (:status result))))
+
+        (testing "mb"
+          (is (:mb result))
+
+          (testing "ref"
+            (is (get-in result [:mb :ref])))
+
+          (testing "entity"
+            (is (get-in result [:mb :entity])))
+
+          (testing "amount"
+            (is (get-in result [:mb :amount]))))))))
+
+(deftest generate-mb-ref-without-expires
   (if-not (env :meo-wallet-api-key)
     (println "Warning: No meo wallet api key on env (ignoring test)")
 
@@ -116,6 +171,9 @@
         (testing "currency"
           (is (= (:currency input-data)
                  (:currency result))))
+
+        (testing "expires-at"
+          (is (not (:expires-at result))))
 
         (testing "transaction-id"
           (is (:transaction-id result)))
