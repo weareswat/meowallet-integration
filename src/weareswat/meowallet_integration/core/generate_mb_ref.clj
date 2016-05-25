@@ -1,8 +1,17 @@
 (ns weareswat.meowallet-integration.core.generate-mb-ref
   (:require [result.core :as result]
             [clojure.core.async :refer [go <!]]
+            [clj-time.format :as f]
+            [clj-time.coerce :as c]
             [weareswat.meowallet-integration.models.payment-reference-request :as prr]
             [clj-meowallet.core :as meowallet]))
+
+(def custom-formatter (f/formatter "yyyy-MM-dd'T'HH:mm:ss+0000"))
+
+(defn date->meowallet-date
+  [date]
+  (when date
+    (f/unparse custom-formatter (c/from-string date))))
 
 (defn transform-input-data
   [context]
@@ -10,7 +19,7 @@
     {:credentials {:meo-wallet-api-key (get-in context [:supplier :api-key])}
      :data {:amount (:amount context)
             :currency (:currency context)
-            :expires (:expires-at context)}}))
+            :expires (date->meowallet-date (:expires-at context))}}))
 
 (defn transform-output-data
   [result]
