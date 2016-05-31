@@ -45,9 +45,11 @@
         result))))
 
 (defn check-data-authenticity
-  [auth-token data]
-  (-> {:meo-wallet-api-key (get-in auth-token [:supplier :token])}
-      (meowallet/verify-callback data)))
+  [context auth-token data]
+  (if-let [verifies (:verify-cb context)]
+    (verifies auth-token data)
+    (-> {:meo-wallet-api-key (get-in auth-token [:supplier :token])}
+        (meowallet/verify-callback data))))
 
 (defn sync-verified-with-payment
   [data]
@@ -64,5 +66,5 @@
   (go
     (result/enforce-let [transformed-data (transform-data data)
                          auth-token (<! (sync-with-payment-gateway-and-get-auth-token transformed-data))
-                         _ (<! (check-data-authenticity auth-token data))]
+                         _ (<! (check-data-authenticity context auth-token data))]
       (<! (sync-verified transformed-data)))))

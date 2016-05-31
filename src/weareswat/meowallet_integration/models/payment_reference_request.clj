@@ -8,6 +8,7 @@
   {:supplier {:api-key s/Str}
    :amount s/Num
    :currency s/Str
+   (s/optional-key :simulator) s/Any
    (s/optional-key :expires-at) s/Any})
 
 (defn validate

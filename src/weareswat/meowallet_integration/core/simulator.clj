@@ -6,14 +6,9 @@
             [environ.core :refer [env]]
             [weareswat.meowallet-integration.core.notify-about-payment :as notify-about-payment]))
 
-(defn not-production?
-  []
-  (not= :production (env :production)))
-
 (defn should-simulate?
   [data]
-  (and (not-production?)
-       (:simulator data)))
+  (:simulator data))
 
 (defn transform-data
   [data]
@@ -26,14 +21,11 @@
      :operation-status "COMPLETED"}))
 
 (defn simulate-request
-  [data]
-  (with-redefs [meowallet/verify-callback (fn [auth-token url]
-                                            (go {:success true
-                                                 :status 200}))]
-    (->> (transform-data data)
-         (notify-about-payment/run! {}))))
+  [context data]
+  (-> (assoc context :verify-cb (fn [auth-token url] (go {:success true :status 200})))
+      (notify-about-payment/run! (transform-data data))))
 
 (defn run!
-  [user-input-data output-data]
+  [context user-input-data output-data]
   (when (should-simulate? user-input-data)
-    (simulate-request output-data)))
+    (simulate-request context output-data)))

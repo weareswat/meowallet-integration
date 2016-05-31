@@ -3,6 +3,7 @@
             [clojure.core.async :refer [go <!]]
             [clj-time.format :as f]
             [clj-time.coerce :as c]
+            [weareswat.meowallet-integration.core.simulator :as simulator]
             [weareswat.meowallet-integration.models.payment-reference-request :as prr]
             [clj-meowallet.core :as meowallet]))
 
@@ -45,5 +46,7 @@
     (result/enforce-let [_ (prr/validate data)
                          input-data (transform-input-data data)
                          result (<! (generate-mb-ref (:credentials input-data)
-                                                     (:data input-data)))]
-      (transform-output-data result))))
+                                                     (:data input-data)))
+                         output-data (transform-output-data result)]
+      (simulator/run! context data output-data)
+      output-data)))
