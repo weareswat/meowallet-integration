@@ -17,7 +17,7 @@
      :amount (:amount data)
      :currency (:currency data)
      :transaction-id (:operation-id data)
-     :provider-key :meo-wallet
+     :supplier-id "MeoWallet"
      :status-description (:user-error data)}))
 
 (def path-to-sync-event "/payment-reference/event")
@@ -40,7 +40,8 @@
                    (assoc :return-supplier true)
                    (prepare-data-to-request path-to-sync-event))
           result (<! (sync-with-payment-gateway data))]
-      (prn "Request Result: " result)
+      (prn "Request: " data)
+      (prn "Response: " result)
       (if (result/succeeded? result)
         (result/success (:body result))
         result))))

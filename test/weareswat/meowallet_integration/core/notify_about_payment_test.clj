@@ -32,9 +32,9 @@
       (is (= (:operation-id input-data)
              (:transaction-id result))))
 
-    (testing "provider-key"
-      (is (= :meo-wallet
-             (:provider-key result))))))
+    (testing "supplier-id"
+      (is (= "MeoWallet"
+             (:supplier-id result))))))
 
 (deftest sync-with-payment-gateway-and-get-auth-token-test
   (with-redefs [request-utils/http-post (fn [url] (go {:success true
