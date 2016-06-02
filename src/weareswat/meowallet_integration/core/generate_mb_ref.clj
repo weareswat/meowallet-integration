@@ -32,7 +32,7 @@
      :expires-at (:expires result)
      :transaction-id (:id result)
      :status (:status result)
-     :mb {:ref (get-in result [:mb :ref])
+     :mb {:reference (get-in result [:mb :ref])
           :entity (get-in result [:mb :entity])
           :amount (:amount result)}}))
 
