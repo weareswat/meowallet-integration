@@ -14,8 +14,6 @@
                     :operation_id "qwkjehqkjwhe"}
         result (notify-about-payment/transform-data input-data)]
 
-    (is (result/succeeded? result))
-
     (testing "status"
       (is (= (:operation_status input-data)
              (:status result))))

@@ -12,13 +12,12 @@
 
 (defn transform-data
   [data]
-  (result/success
-    {:status (:operation_status data)
-     :amount (:amount data)
-     :currency (:currency data)
-     :transaction-id (:operation_id data)
-     :supplier-id "MeoWallet"
-     :status-description (:user_error data)}))
+  {:status (:operation_status data)
+   :amount (:amount data)
+   :currency (:currency data)
+   :transaction-id (:operation_id data)
+   :supplier-id "MeoWallet"
+   :status-description (:user_error data)})
 
 (def path-to-sync-event "/payment-reference/event")
 (def path-to-verify "/payment-reference/verify")
@@ -67,7 +66,7 @@
   [context data]
   (go
     (prn "MEO DATA: " data)
-    (result/enforce-let [transformed-data (transform-data data)
-                         auth-token (<! (sync-with-payment-gateway-and-get-auth-token transformed-data))
-                         _ (<! (check-data-authenticity context auth-token data))]
-      (<! (sync-verified transformed-data)))))
+    (let [transformed-data (transform-data data)]
+      (result/enforce-let [auth-token (<! (sync-with-payment-gateway-and-get-auth-token transformed-data))
+                           _ (<! (check-data-authenticity context auth-token data))]
+                          (<! (sync-verified transformed-data))))))
