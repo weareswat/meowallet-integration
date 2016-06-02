@@ -8,16 +8,16 @@
             [request-utils.core :as request-utils]))
 
 (deftest transform-data-test
-  (let [input-data {:operation-status "COMPLETED"
+  (let [input-data {:operation_status "COMPLETED"
                     :amount 10
                     :currency "EUR"
-                    :operation-id "qwkjehqkjwhe"}
+                    :operation_id "qwkjehqkjwhe"}
         result (notify-about-payment/transform-data input-data)]
 
     (is (result/succeeded? result))
 
     (testing "status"
-      (is (= (:operation-status input-data)
+      (is (= (:operation_status input-data)
              (:status result))))
 
     (testing "amount"
@@ -28,8 +28,8 @@
       (is (= (:currency input-data)
              (:currency result))))
 
-    (testing "transaction-id"
-      (is (= (:operation-id input-data)
+    (testing "transaction_id"
+      (is (= (:operation_id input-data)
              (:transaction-id result))))
 
     (testing "supplier-id"

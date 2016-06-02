@@ -13,12 +13,12 @@
 (defn transform-data
   [data]
   (result/success
-    {:status (:operation-status data)
+    {:status (:operation_status data)
      :amount (:amount data)
      :currency (:currency data)
-     :transaction-id (:operation-id data)
+     :transaction-id (:operation_id data)
      :supplier-id "MeoWallet"
-     :status-description (:user-error data)}))
+     :status-description (:user_error data)}))
 
 (def path-to-sync-event "/payment-reference/event")
 (def path-to-verify "/payment-reference/verify")
