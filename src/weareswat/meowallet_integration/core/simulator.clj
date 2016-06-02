@@ -12,13 +12,16 @@
 
 (defn transform-data
   [data]
-  (result/success
-    {:currency (:currency data)
-     :amount (get-in data [:mb :amount])
-     :method (:payment-method data)
-     :event "COMPLETED"
-     :operation-id (:transaction-id data)
-     :operation-status "COMPLETED"}))
+  (let [new-data {:currency (:currency data)
+                  :amount (get-in data [:mb :amount])
+                  :method (:payment-method data)
+                  :event "COMPLETED"
+                  :operation-id (:transaction-id data)
+                  :operation-status "COMPLETED"}]
+    (prn "I'll do a request with this data: " new-data)
+    (prn "Sync endpoint: " (str (notify-about-payment/host) notify-about-payment/path-to-sync-event))
+    (prn "Verify endpoint: " (str (notify-about-payment/host) notify-about-payment/path-to-verify))
+    (result/success new-data)))
 
 (defn simulate-request
   [context data]
