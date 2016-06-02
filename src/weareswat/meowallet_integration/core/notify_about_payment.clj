@@ -40,6 +40,7 @@
                    (assoc :return-supplier true)
                    (prepare-data-to-request path-to-sync-event))
           result (<! (sync-with-payment-gateway data))]
+      (prn "Request Result: " result)
       (if (result/succeeded? result)
         (result/success (:body result))
         result))))
