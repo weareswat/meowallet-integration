@@ -90,7 +90,7 @@
 
       (testing "ref"
         (is (= (get-in meo-result-data [:mb :ref])
-               (get-in result [:mb :ref]))))
+               (get-in result [:mb :reference]))))
 
       (testing "entity"
         (is (= (get-in meo-result-data [:mb :entity])
@@ -143,7 +143,7 @@
           (is (:mb result))
 
           (testing "ref"
-            (is (get-in result [:mb :ref])))
+            (is (get-in result [:mb :reference])))
 
           (testing "entity"
             (is (get-in result [:mb :entity])))
@@ -192,7 +192,7 @@
           (is (:mb result))
 
           (testing "ref"
-            (is (get-in result [:mb :ref])))
+            (is (get-in result [:mb :reference])))
 
           (testing "entity"
             (is (get-in result [:mb :entity])))
