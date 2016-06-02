@@ -16,6 +16,7 @@
                   :amount (get-in data [:mb :amount])
                   :method (:payment-method data)
                   :event "COMPLETED"
+                  :supplier-id "MeoWallet"
                   :operation-id (:transaction-id data)
                   :operation-status "COMPLETED"}]
     (prn "I'll do a request with this data: " new-data)
