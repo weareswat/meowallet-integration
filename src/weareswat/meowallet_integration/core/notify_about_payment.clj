@@ -66,6 +66,7 @@
 (defn run!
   [context data]
   (go
+    (prn "MEO DATA: " data)
     (result/enforce-let [transformed-data (transform-data data)
                          auth-token (<! (sync-with-payment-gateway-and-get-auth-token transformed-data))
                          _ (<! (check-data-authenticity context auth-token data))]
