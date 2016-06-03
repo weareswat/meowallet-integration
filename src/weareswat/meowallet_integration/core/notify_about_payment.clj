@@ -48,13 +48,18 @@
 (defn check-data-authenticity
   [context auth-token data]
   (if-let [verifies (:verify-cb context)]
-    (verifies auth-token data)
+    (do
+      (prn "VERIFY RESULT: " (verifies auth-token data))
+      (verifies auth-token data))
     (-> {:meo-wallet-api-key (get-in auth-token [:supplier :token])}
         (meowallet/verify-callback data))))
 
 (defn sync-verified-with-payment
   [data]
-  (request-utils/http-post data))
+  (prn "Request Verified: " data)
+  (let [result (request-utils/http-post data)]
+    (prn "Response Verified: " result)
+    result))
 
 (defn sync-verified
   [data]
