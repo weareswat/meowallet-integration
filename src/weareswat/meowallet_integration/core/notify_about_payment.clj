@@ -1,7 +1,7 @@
 (ns weareswat.meowallet-integration.core.notify-about-payment
   (:refer-clojure :exclude [run!])
   (:require [result.core :as result]
-            [clojure.core.async :refer [go <!]]
+            [clojure.core.async :refer [go <! <!!]]
             [environ.core :refer [env]]
             [clj-meowallet.core :as meowallet]
             [request-utils.core :as request-utils]))
@@ -20,7 +20,7 @@
    :status-description (:user_error data)})
 
 (def path-to-sync-event "/payment-reference/event")
-(def path-to-verify "/payment-reference/verify")
+(def path-to-verify "/payment-reference/verify-event")
 
 (defn prepare-data-to-request
   [data path]
@@ -33,28 +33,35 @@
   (request-utils/http-post data))
 
 (defn sync-with-payment-gateway-and-get-auth-token
-  [data]
+  ([data]
+   (sync-with-payment-gateway-and-get-auth-token {} data))
+  ([context data]
   (go
-    (let [data (-> (assoc data :verified false)
+    (let [dataa (-> (assoc data :verified false)
                    (assoc :return-supplier true)
                    (prepare-data-to-request path-to-sync-event))
-          result (<! (sync-with-payment-gateway data))]
-      (prn "Request: " data)
-      (prn "Response: " result)
-      (if (result/succeeded? result)
-        (result/success (:body result))
-        result))))
+          result (<! (sync-with-payment-gateway dataa))]
+      (when (:verify-cb context)
+        (prn (str "Request: " data))
+        (prn (str "RESPONSE: " result)))
+      result))))
 
 (defn check-data-authenticity
   [context auth-token data]
   (if-let [verifies (:verify-cb context)]
-    (verifies auth-token data)
+    (do
+      (prn (str "Ill check data authenticity"  " CHECK DATA AUTHENTICITY CONTEXT: " context " AUTH: " auth-token " DATA: " data))
+      (prn (str "VERIFY RESULT: " (<!! (verifies auth-token data))))
+      (verifies auth-token data))
     (-> {:meo-wallet-api-key (get-in auth-token [:supplier :token])}
         (meowallet/verify-callback data))))
 
 (defn sync-verified-with-payment
   [data]
-  (request-utils/http-post data))
+  (prn (str "Request Verified: " data))
+  (let [result (request-utils/http-post data)]
+    (prn (str "Response Verified: " (<!! result)))
+    result))
 
 (defn sync-verified
   [data]
@@ -65,8 +72,9 @@
 (defn run!
   [context data]
   (go
-    (prn "MEO DATA: " data)
     (let [transformed-data (transform-data data)]
-      (result/enforce-let [auth-token (<! (sync-with-payment-gateway-and-get-auth-token transformed-data))
-                           _ (<! (check-data-authenticity context auth-token data))]
-                          (<! (sync-verified transformed-data))))))
+      (when (:verify-cb context)
+        (println (str "CONTEXT: " context " DATA: " data)))
+      (result/enforce-let [sync-response (<! (sync-with-payment-gateway-and-get-auth-token context transformed-data))
+                           _ (<! (check-data-authenticity context sync-response data))]
+                          (<! (sync-verified (assoc transformed-data :id (:id sync-response))))))))

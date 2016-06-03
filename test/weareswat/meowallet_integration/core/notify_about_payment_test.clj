@@ -37,7 +37,7 @@
 (deftest sync-with-payment-gateway-and-get-auth-token-test
   (with-redefs [request-utils/http-post (fn [url] (go {:success true
                                                        :status 200
-                                                       :body {:supplier {:token "faketoken"}}}))]
+                                                       :supplier {:token "faketoken"}}))]
     (let [result (<!! (notify-about-payment/sync-with-payment-gateway-and-get-auth-token {}))]
       (is (result/succeeded? result))
       (is (= "faketoken"
@@ -46,7 +46,7 @@
 (deftest fail-to-check-data-authenticity-flow
   (with-redefs [notify-about-payment/sync-with-payment-gateway (fn [url] (go {:success true
                                                                               :status 200
-                                                                              :body {:supplier {:token "faketoken"}}}))
+                                                                              :supplier {:token "faketoken"}}))
                 meowallet/verify-callback (fn [auth-token url]
                                             (go {:success false
                                                  :status 400
