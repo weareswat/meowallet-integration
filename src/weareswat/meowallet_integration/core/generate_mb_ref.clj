@@ -3,6 +3,7 @@
             [clojure.core.async :refer [go <!]]
             [clj-time.format :as f]
             [clj-time.coerce :as c]
+            [clojure.string :as clj-str]
             [weareswat.meowallet-integration.core.simulator :as simulator]
             [weareswat.meowallet-integration.models.payment-reference-request :as prr]
             [clj-meowallet.core :as meowallet]))
@@ -27,11 +28,11 @@
   (result/success
     {:fee (:fee result)
      :created-at (:date result)
-     :payment-method (:method result)
+     :payment-method (clj-str/lower-case (:method result))
      :currency (:currency result)
      :expires-at (:expires result)
      :transaction-id (:id result)
-     :status (:status result)
+     :status (clj-str/lower-case (:status result))
      :mb {:reference (get-in result [:mb :ref])
           :entity (get-in result [:mb :entity])
           :amount (:amount result)}}))
