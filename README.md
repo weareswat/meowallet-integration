@@ -21,5 +21,3 @@ You need to install [lein](http://leiningen.org/)
 ### Staging
 
 The staging environment is located [here](http://meo-wallet-integration-staging.herokuapp.com/) and you can read and try the api documentation [here](http://meo-wallet-integration-staging.herokuapp.com/api-docs/).
-
-`SANDBOX_MEO_WALLET_API_KEY= "ef5a07f7c74f2c2caaa20890943fb4bdc94e7c6d"`
