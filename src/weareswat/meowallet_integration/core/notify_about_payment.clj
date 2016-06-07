@@ -2,6 +2,7 @@
   (:refer-clojure :exclude [run!])
   (:require [result.core :as result]
             [clojure.core.async :refer [go <! <!!]]
+            [clojure.string :as clj-str]
             [environ.core :refer [env]]
             [clj-meowallet.core :as meowallet]
             [request-utils.core :as request-utils]))
@@ -12,7 +13,7 @@
 
 (defn transform-data
   [data]
-  {:status (:operation_status data)
+  {:status (clj-str/lower-case (:operation_status data))
    :amount (:amount data)
    :currency (:currency data)
    :transaction-id (:operation_id data)

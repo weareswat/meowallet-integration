@@ -2,6 +2,7 @@
   (:use clojure.test)
   (:require [weareswat.meowallet-integration.core.notify-about-payment :as notify-about-payment]
             [clj-meowallet.core :as meowallet]
+            [clojure.string :as clj-str]
             [clojure.core.async :refer [<!! go]]
             [environ.core :refer [env]]
             [result.core :as result]
@@ -15,7 +16,7 @@
         result (notify-about-payment/transform-data input-data)]
 
     (testing "status"
-      (is (= (:operation_status input-data)
+      (is (= (clj-str/lower-case (:operation_status input-data))
              (:status result))))
 
     (testing "amount"
@@ -58,8 +59,8 @@
                       :ext-email "noreply@sapo.pt"
                       :ext-invoiceid "38440200100"
                       :method "WALLET"
-                      :operation-id "qwkjehqkjwhe"
-                      :operation-status "COMPLETED"
+                      :operation_id "qwkjehqkjwhe"
+                      :operation_status "COMPLETED"
                       :user "237"}
           result (<!! (notify-about-payment/run! {} input-data))]
 
@@ -91,8 +92,8 @@
                       :ext-email "noreply@sapo.pt"
                       :ext-invoiceid "38440200100"
                       :method "WALLET"
-                      :operation-id "qwkjehqkjwhe"
-                      :operation-status "COMPLETED"
+                      :operation_id "qwkjehqkjwhe"
+                      :operation_status "COMPLETED"
                       :user "237"}
 
           result (<!! (notify-about-payment/run! {} input-data))]

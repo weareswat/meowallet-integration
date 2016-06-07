@@ -26,8 +26,8 @@
                   :ext-email "noreply@sapo.pt"
                   :ext-invoiceid "38440200100"
                   :method "WALLET"
-                  :operation-id "qwkjehqkjwhe"
-                  :operation-status "COMPLETED"
+                  :operation_id "qwkjehqkjwhe"
+                  :operation_status "COMPLETED"
                   :user "237"}
             response (test-request/parsed-response :post
                                                    "/payment-reference/event"
@@ -47,8 +47,8 @@
                   :ext-email "noreply@sapo.pt"
                   :ext-invoiceid "38440200100"
                   :method "WALLET"
-                  :operation-id "qwkjehqkjwhe"
-                  :operation-status "COMPLETED"
+                  :operation_id "qwkjehqkjwhe"
+                  :operation_status "COMPLETED"
                   :user "237"}
             response (test-request/parsed-response :post
                                                    "/payment-reference/create"
