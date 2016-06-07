@@ -1,6 +1,7 @@
 (ns weareswat.meowallet-integration.core.generate-mb-ref-test
   (:use clojure.test)
   (:require [weareswat.meowallet-integration.core.generate-mb-ref :as generate-mb-ref]
+            [clojure.string :as clj-str]
             [clojure.core.async :refer [<!!]]
             [environ.core :refer [env]]
             [result.core :as result]))
@@ -72,7 +73,7 @@
              (:created-at result))))
 
     (testing "payment-method"
-      (is (= (:method meo-result-data)
+      (is (= (clj-str/lower-case (:method meo-result-data))
              (:payment-method result))))
 
     (testing "transaction-id"
@@ -80,7 +81,7 @@
              (:transaction-id result))))
 
     (testing "status"
-      (is (= (:status meo-result-data)
+      (is (= (clj-str/lower-case (:status meo-result-data))
              (:status result))))
 
     (testing "mb"
@@ -115,7 +116,7 @@
       (testing "validate format result"
 
         (testing "payment-method"
-          (is (= "MB"
+          (is (= (clj-str/lower-case "MB")
                  (:payment-method result))))
 
         (testing "expires-at"
@@ -136,7 +137,7 @@
           (is (:fee result)))
 
         (testing "status"
-          (is (= "PENDING"
+          (is (= (clj-str/lower-case "PENDING")
                  (:status result))))
 
         (testing "mb"
@@ -165,7 +166,7 @@
       (testing "validate format result"
 
         (testing "payment-method"
-          (is (= "MB"
+          (is (= (clj-str/lower-case "MB")
                  (:payment-method result))))
 
         (testing "currency"
@@ -185,7 +186,7 @@
           (is (:fee result)))
 
         (testing "status"
-          (is (= "PENDING"
+          (is (= (clj-str/lower-case "PENDING")
                  (:status result))))
 
         (testing "mb"
