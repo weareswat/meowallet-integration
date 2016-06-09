@@ -16,7 +16,8 @@
   (cors/wrap-cors handler
                   :access-control-allow-origin
                   [#"^http://localhost(.*)"
-                   #"^http?://(.*)meo-wallet-integration-staging.herokuapp.com(.*)"]
+                   #"^http?://(.*)meo-wallet-integration-staging.herokuapp.com(.*)"
+                   #"(.*)cloudapp.net(.*)"]
                   :access-control-allow-methods [:get :put :post :delete]))
 
 (defn- set-system
@@ -58,7 +59,7 @@
 
 (defn get-port
   []
-  (Integer/parseInt (or (env :port) "5050")))
+  (Integer/parseInt (or (env :port) (env :meowallet-integration-port) "5050")))
 
 (defn create
   "Creates a new http component"
