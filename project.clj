@@ -1,4 +1,4 @@
-(defproject weareswat/meowallet-integration "0.2.0"
+(defproject weareswat/meowallet-integration "0.3.0"
   :description "Meowallet integration"
   :url "https://github.com/weareswat/meowallet-integration"
 
@@ -12,6 +12,7 @@
                  [metosin/compojure-api "1.1.0"]
                  [weareswat/request-utils "0.1.0"]
                  [clj-time "0.11.0"]
+                 [clanhr/analytics "1.11.0"]
                  [weareswat/clj-meowallet "0.6.0"]
                  [prismatic/schema "1.1.1"]
                  [com.taoensso/timbre "4.3.1"]
