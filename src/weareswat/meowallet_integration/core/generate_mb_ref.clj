@@ -39,7 +39,11 @@
 
 (defn generate-mb-ref
   [credentials data]
-  (meowallet/generate-mb-ref credentials data))
+  (go
+    (result/on-success [response (<! (meowallet/generate-mb-ref credentials data))]
+      (result/success (if-let [body (:body response)]
+                        body
+                        response)))))
 
 (defn run
   [context data]

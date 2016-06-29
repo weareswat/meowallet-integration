@@ -1,4 +1,4 @@
-(defproject weareswat/meowallet-integration "0.3.0"
+(defproject weareswat/meowallet-integration "0.3.1"
   :description "Meowallet integration"
   :url "https://github.com/weareswat/meowallet-integration"
 
@@ -10,7 +10,7 @@
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [org.clojure/core.async "0.2.374"]
                  [metosin/compojure-api "1.1.0"]
-                 [weareswat/request-utils "0.1.0"]
+                 [weareswat/request-utils "0.4.0"]
                  [clj-time "0.11.0"]
                  [clanhr/analytics "1.11.0"]
                  [weareswat/clj-meowallet "0.6.0"]

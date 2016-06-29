@@ -42,26 +42,18 @@
                    (assoc :return-supplier true)
                    (prepare-data-to-request path-to-sync-event))
           result (<! (sync-with-payment-gateway dataa))]
-      (when (:verify-cb context)
-        (prn (str "Request: " data))
-        (prn (str "RESPONSE: " result)))
       result))))
 
 (defn check-data-authenticity
   [context auth-token data]
   (if-let [verifies (:verify-cb context)]
-    (do
-      (prn (str "Ill check data authenticity"  " CHECK DATA AUTHENTICITY CONTEXT: " context " AUTH: " auth-token " DATA: " data))
-      (prn (str "VERIFY RESULT: " (<!! (verifies auth-token data))))
-      (verifies auth-token data))
+    (verifies auth-token data)
     (-> {:meo-wallet-api-key (get-in auth-token [:supplier :token])}
         (meowallet/verify-callback data))))
 
 (defn sync-verified-with-payment
   [data]
-  (prn (str "Request Verified: " data))
   (let [result (request-utils/http-post data)]
-    (prn (str "Response Verified: " (<!! result)))
     result))
 
 (defn sync-verified
@@ -74,8 +66,6 @@
   [context data]
   (go
     (let [transformed-data (transform-data data)]
-      (when (:verify-cb context)
-        (println (str "CONTEXT: " context " DATA: " data)))
       (result/enforce-let [sync-response (<! (sync-with-payment-gateway-and-get-auth-token context transformed-data))
                            _ (<! (check-data-authenticity context sync-response data))]
                           (<! (sync-verified (assoc transformed-data :id (:id sync-response))))))))
