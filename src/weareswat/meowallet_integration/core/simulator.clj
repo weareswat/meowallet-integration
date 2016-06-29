@@ -19,12 +19,10 @@
                   :supplier-id "MeoWallet"
                   :operation_id (:transaction-id data)
                   :operation_status "COMPLETED"}]
-    (prn (str "I'll do a request with this data: " new-data))
     (result/success new-data)))
 
 (defn simulate-request
   [context data]
-  (prn (str "LET'S SIMULATE: " (assoc context :verify-cb (fn [auth-token url] (go {:success true :status 200})))))
   (-> (assoc context :verify-cb (fn [auth-token url] (go {:success true :status 200})))
       (notify-about-payment/run! (transform-data data))))
 
