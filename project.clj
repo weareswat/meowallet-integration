@@ -1,4 +1,4 @@
-(defproject weareswat/meowallet-integration "0.3.1"
+(defproject weareswat/meowallet-integration "0.3.2"
   :description "Meowallet integration"
   :url "https://github.com/weareswat/meowallet-integration"
 

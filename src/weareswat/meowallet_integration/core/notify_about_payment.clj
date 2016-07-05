@@ -3,6 +3,7 @@
   (:require [result.core :as result]
             [clojure.core.async :refer [go <! <!!]]
             [clojure.string :as clj-str]
+            [taoensso.timbre :as logger]
             [environ.core :refer [env]]
             [clj-meowallet.core :as meowallet]
             [request-utils.core :as request-utils]))
@@ -48,8 +49,10 @@
   [context auth-token data]
   (if-let [verifies (:verify-cb context)]
     (verifies auth-token data)
-    (-> {:meo-wallet-api-key (get-in auth-token [:supplier :token])}
-        (meowallet/verify-callback data))))
+    (go (let [result (<! (-> {:meo-wallet-api-key (get-in auth-token [:body :supplier :api-key])}
+                       (meowallet/verify-callback data)))]
+      (logger/info (str "verify response: " result))
+      result))))
 
 (defn sync-verified-with-payment
   [data]
@@ -68,4 +71,4 @@
     (let [transformed-data (transform-data data)]
       (result/enforce-let [sync-response (<! (sync-with-payment-gateway-and-get-auth-token context transformed-data))
                            _ (<! (check-data-authenticity context sync-response data))]
-                          (<! (sync-verified (assoc transformed-data :id (:id sync-response))))))))
+        (<! (sync-verified (assoc transformed-data :id (get-in sync-response [:body :id]))))))))
