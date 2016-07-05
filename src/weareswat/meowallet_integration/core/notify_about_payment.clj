@@ -49,7 +49,7 @@
   [context auth-token data]
   (if-let [verifies (:verify-cb context)]
     (verifies auth-token data)
-    (go (let [result (<! (-> {:meo-wallet-api-key (get-in auth-token [:supplier :token])}
+    (go (let [result (<! (-> {:meo-wallet-api-key (get-in auth-token [:body :supplier :api-key])}
                        (meowallet/verify-callback data)))]
       (logger/info (str "verify response: " result))
       result))))
@@ -71,4 +71,4 @@
     (let [transformed-data (transform-data data)]
       (result/enforce-let [sync-response (<! (sync-with-payment-gateway-and-get-auth-token context transformed-data))
                            _ (<! (check-data-authenticity context sync-response data))]
-                          (<! (sync-verified (assoc transformed-data :id (:id sync-response))))))))
+        (<! (sync-verified (assoc transformed-data :id (get-in sync-response [:body :id]))))))))

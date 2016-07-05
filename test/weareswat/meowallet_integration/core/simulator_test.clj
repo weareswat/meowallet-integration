@@ -36,7 +36,7 @@
 (deftest simulate-test
   (with-redefs [notify-about-payment/sync-with-payment-gateway (fn [url] (go {:success true
                                                                               :status 200
-                                                                              :body {:supplier {:token "faketoken"}}}))
+                                                                              :body {:supplier {:api-key "faketoken"}}}))
                 notify-about-payment/sync-verified (fn [data] (go {:success true
                                                                    :status 200
                                                                    :data data}))]
